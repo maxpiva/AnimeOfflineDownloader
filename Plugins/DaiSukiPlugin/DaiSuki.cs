@@ -654,18 +654,23 @@ namespace DaiSukiPlugin
                         {
                             if (tsks[x].Result != null)
                             {
-                                Episode ep = tsks[x].Result.Items.OrderByDescending(a => a.Index).First();
-                                ep.UniqueTag = DaiSukiPluginInfo.PluginName + "|" + ep.ShowName + "|" + ep.EpisodeAlpha;
-                                if (UpdateHistory.Exists(ep.UniqueTag))
+                                if (tsks[x].Result.Items.Count > 0)
                                 {
-                                    Episode c = JsonConvert.DeserializeObject<Episode>(UpdateHistory.Get(ep.UniqueTag));
-                                    upds.Items.Add(c);
-                                }
-                                else
-                                {
-                                    ep.DateTime = datetime;
-                                    UpdateHistory.Add(ep.UniqueTag, JsonConvert.SerializeObject(ep));
-                                    upds.Items.Add(ep);
+                                    Episode ep = tsks[x].Result.Items.OrderByDescending(a => a.Index).First();
+                                    ep.UniqueTag = DaiSukiPluginInfo.PluginName + "|" + ep.ShowName + "|" +
+                                                   ep.EpisodeAlpha;
+                                    if (UpdateHistory.Exists(ep.UniqueTag))
+                                    {
+                                        Episode c =
+                                            JsonConvert.DeserializeObject<Episode>(UpdateHistory.Get(ep.UniqueTag));
+                                        upds.Items.Add(c);
+                                    }
+                                    else
+                                    {
+                                        ep.DateTime = datetime;
+                                        UpdateHistory.Add(ep.UniqueTag, JsonConvert.SerializeObject(ep));
+                                        upds.Items.Add(ep);
+                                    }
                                 }
                             }
                         }
