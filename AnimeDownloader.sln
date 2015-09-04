@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimeDownloader", "AnimeDownloader\AnimeDownloader.csproj", "{3E9F577A-5CFF-4975-BDD8-660C99015402}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ADBaseLibrary", "ADBaseLibrary\ADBaseLibrary.csproj", "{FD2DD652-E61E-47CB-9B12-D2E2830F62C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginSettingsLibrary", "PluginSettingsLibrary\PluginSettingsLibrary.csproj", "{3B411F29-8E78-4E91-AB3D-BE4DC4DEE0FA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{20EDCC47-1B67-48C3-A045-E671E0E37091}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrunchyPlugin", "Plugins\CrunchyPlugin\CrunchyPlugin.csproj", "{DA9E7E85-1C7D-40B4-AFF0-5B31E6152D78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DaiSukiPlugin", "Plugins\DaiSukiPlugin\DaiSukiPlugin.csproj", "{FB92D4B5-1FBF-4678-ACA7-B8C94CA2B5DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3E9F577A-5CFF-4975-BDD8-660C99015402}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E9F577A-5CFF-4975-BDD8-660C99015402}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E9F577A-5CFF-4975-BDD8-660C99015402}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E9F577A-5CFF-4975-BDD8-660C99015402}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD2DD652-E61E-47CB-9B12-D2E2830F62C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD2DD652-E61E-47CB-9B12-D2E2830F62C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD2DD652-E61E-47CB-9B12-D2E2830F62C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD2DD652-E61E-47CB-9B12-D2E2830F62C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B411F29-8E78-4E91-AB3D-BE4DC4DEE0FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B411F29-8E78-4E91-AB3D-BE4DC4DEE0FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B411F29-8E78-4E91-AB3D-BE4DC4DEE0FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B411F29-8E78-4E91-AB3D-BE4DC4DEE0FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA9E7E85-1C7D-40B4-AFF0-5B31E6152D78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA9E7E85-1C7D-40B4-AFF0-5B31E6152D78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA9E7E85-1C7D-40B4-AFF0-5B31E6152D78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA9E7E85-1C7D-40B4-AFF0-5B31E6152D78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB92D4B5-1FBF-4678-ACA7-B8C94CA2B5DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB92D4B5-1FBF-4678-ACA7-B8C94CA2B5DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB92D4B5-1FBF-4678-ACA7-B8C94CA2B5DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB92D4B5-1FBF-4678-ACA7-B8C94CA2B5DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DA9E7E85-1C7D-40B4-AFF0-5B31E6152D78} = {20EDCC47-1B67-48C3-A045-E671E0E37091}
+		{FB92D4B5-1FBF-4678-ACA7-B8C94CA2B5DA} = {20EDCC47-1B67-48C3-A045-E671E0E37091}
+	EndGlobalSection
+EndGlobal

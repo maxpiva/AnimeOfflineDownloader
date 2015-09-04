@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3B411F29-8E78-4E91-AB3D-BE4DC4DEE0FA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PluginSettingsLibrary</RootNamespace>
+    <AssemblyName>PluginSettingsLibrary</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\Link.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Plugin.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Plugin.Designer.cs">
+      <DependentUpon>Plugin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Boolean.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\RequirimentsExtensions.cs" />
+    <Compile Include="Controls\DropDownList.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\FilePath.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\FolderPath.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\IInit.cs" />
+    <Compile Include="Controls\Integer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Password.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\String.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Downloads.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Downloads.Designer.cs">
+      <DependentUpon>Downloads.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Global.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Global.Designer.cs">
+      <DependentUpon>Global.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ISettings.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TagInfo.cs" />
+    <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ADBaseLibrary\ADBaseLibrary.csproj">
+      <Project>{fd2dd652-e61e-47cb-9b12-d2e2830f62c4}</Project>
+      <Name>ADBaseLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugin.resx">
+      <DependentUpon>Plugin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Downloads.resx">
+      <DependentUpon>Downloads.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Global.resx">
+      <DependentUpon>Global.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
