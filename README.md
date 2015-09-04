@@ -17,7 +17,7 @@ Usage of this application may also cause a violation of the agreed *Terms of Ser
 
 A tool is not responsible for your actions; please make an informed decision prior to using this application.
 
-Any Stream decryption is done by a third party program, in case of Crunchyroll by RTMPDump, in case of Daisuki by the akamai decryption flash library, 
+Any Stream decryption is done by a third party program, in case of Crunchyroll by RTMPDump, in case of Daisuki by the akamai decryption flash library.
 
 Usage of this third party programs and/or libraries may be forbidden in your country without proper consent of the copyright holder. None of this programs/libraries are included in this release.
 
