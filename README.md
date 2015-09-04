@@ -34,6 +34,7 @@ Valid PAID account in the stream provider of choice.
 ## Installation (Windows Only)
 
 Install .NET Framework 4.5.1
+
 Decompress the Application and Double Click the AnimeOfflineDownloader.exe.
 
 
