@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -123,5 +124,22 @@ namespace AnimeDownloader
             }
         }
 
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            List<DownloadItem> downs = objDownloads.Objects.Cast<DownloadItem>().ToList();
+            if (downs.Any(a => a.Status == DownloadStatus.Downloading))
+            {
+                DialogResult r=MessageBox.Show("Are you sure you want to quit, there is some downloads left?", "Quit?",
+                    MessageBoxButtons.YesNo);
+                if (r == DialogResult.No)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                butRemoveAll_Click(null, null);
+            }
+            DownloadPluginHandler.Instance.Exit();
+            e.Cancel = false;
+        }
     }
 }

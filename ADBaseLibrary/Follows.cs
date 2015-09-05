@@ -71,8 +71,11 @@ namespace ADBaseLibrary
 
         public void AddDownload(EpisodeWithDownloadSettings d)
         {
-            Downloads.Add(d);
-            Save();
+            if (!Downloads.Any(a => a.Id == d.Id && a.PluginName == d.PluginName && a.Quality == d.Quality && a.Format == d.Format))
+            { 
+                Downloads.Add(d);
+                Save();
+            }
         }
         public List<EpisodeWithDownloadSettings> CheckFollows(List<Episode> upds)
         {

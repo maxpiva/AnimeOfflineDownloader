@@ -25,6 +25,8 @@ namespace AnimeDownloader
             _manager = new DownloadManager(Settings.Instance.SimultaneousDownloads);
             _manager.OnProgress += (a) =>
             {
+                if (a.Status==DownloadStatus.Complete)
+                    Follows.Instance.AddDownload(a.Episode);
                 objDownloads.RefreshObject(a);
                 if (a==objDownloads.SelectedObject)
                     RefreshInfo();
@@ -248,7 +250,7 @@ namespace AnimeDownloader
 
         private void butRemoveDownloaded_Click(object sender, EventArgs e)
         {
-            RemoveFlagged(DownloadStatus.Downloading);
+            RemoveFlagged(DownloadStatus.Complete);
 
         }
 

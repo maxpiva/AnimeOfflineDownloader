@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using AxShockwaveFlashObjects;
 
@@ -15,6 +16,8 @@ namespace ADBaseLibrary.AdobeHDS.FlashWrapper
         internal  AxShockwaveFlash axShock;
         private static Thread thread;
         private static bool _isinit = false;
+        private static TaskScheduler thscheduler;
+
         public static void Init()
         {
             if (_isinit)
@@ -23,17 +26,19 @@ namespace ADBaseLibrary.AdobeHDS.FlashWrapper
             thread = new Thread(CreateComponent);
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start(null);
-            AppDomain.CurrentDomain.ProcessExit += (a, b) =>
-            {
-                thread?.Abort();
-                thread = null;
-            };
+            AppDomain.CurrentDomain.FirstChanceException += (a,b) => { };
         }
 
 
- 
 
-
+        public static void Kill()
+        {
+            if (thread != null)
+            {
+                Task.Factory.StartNew(Application.Exit, CancellationToken.None, TaskCreationOptions.None, thscheduler);
+                thread = null;
+            }
+        }
 
         private static void CreateComponent(object obj)
         {
@@ -55,6 +60,9 @@ namespace ADBaseLibrary.AdobeHDS.FlashWrapper
             string swf = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "loader.swf");
             if (File.Exists(swf))
                 form.axShock.LoadMovie(0, swf);
+            form.axShock.Stop();
+            form.axShock.Dispose();
+            thscheduler= TaskScheduler.FromCurrentSynchronizationContext();
             Application.Run();
         }
         public DecryptForm()

@@ -470,6 +470,11 @@ namespace CrunchyPlugin
            
         }
 
+        public void Exit()
+        {
+
+        }
+
         #endregion
 
         #region Helpers

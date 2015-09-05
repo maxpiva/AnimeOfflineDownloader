@@ -20,5 +20,6 @@ namespace ADBaseLibrary
         Task<Episodes> Episodes(ISession session, Show show);
         Task<Response> Download(ISession session, Episode episode, string template, string downloadpath, Quality quality, Format format, CancellationToken token, IProgress<DownloadInfo> progress);
         Task<Updates> Updates(ISession session);
+        void Exit();
     }
 }

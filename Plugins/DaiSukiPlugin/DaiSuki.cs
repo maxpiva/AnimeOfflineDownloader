@@ -685,7 +685,10 @@ namespace DaiSukiPlugin
             }
         }
 
-
+        public void Exit()
+        {
+            DecryptForm.Kill();
+        }
 
 
         private KeyValuePair<Media,Quality>? BestMediaFromManifest(Manifest m, Quality q)

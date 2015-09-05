@@ -130,6 +130,13 @@ namespace ADBaseLibrary
             return await AuthWrapper(plugin, async (plg, session) => await plg.Download(session, ep, template, downloadpath, quality, format, token, progress));
         }
 
+        public void Exit()
+        {
+            foreach (IDownloadPlugin plugin in Plugins.Values)
+            {
+                plugin.Exit();
+            }
+        }
 
 
         public DownloadPluginHandler()
