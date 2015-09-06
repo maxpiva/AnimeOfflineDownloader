@@ -27,16 +27,48 @@ namespace DaiSukiPlugin
         DaiSukiPluginInfo _info = new DaiSukiPluginInfo();
         private Dictionary<string, object> _global = null;
         private Dictionary<string, object> _authmeta = null;
-         
-        private static Regex showregex = new Regex(Properties.Settings.Default.ShowRegex ?? "<div\\sclass=\"latestMovieThumbnail\".*?<img\\sdelay=\"(?<image>.*?)\".*?<p\\sclass=\"episodeNumber\">(?<episode>.*?)</p>.*?<a\\shref=\"(?<url>.*?)\"", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static Regex show2regex = new Regex(Properties.Settings.Default.Show2Regex ?? "<div\\sclass=\"thumbnail\">.*?<img delay=\"(?<image>.*?)\".*?<a\\shref=\"(?<url>.*?)\">(?<episode>.*?)</a>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static string imageServer = Properties.Settings.Default.ImageServer ?? "http://img.daisuki.net/";
-        private static Regex bgnWrapper=new Regex(Properties.Settings.Default.BgnWrapper ?? "<script.*?src=\"(?<wrapper>.*?bgnwrapper\\.js.*?)\"",RegexOptions.Compiled);
-        private static Regex flashVars = new Regex(Properties.Settings.Default.FlashVars ?? "flashvars.*?=*.?{(?<vars>.*?)}", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static Regex flash2Vars = new Regex(Properties.Settings.Default.Flash2Vars ?? "(['\"])(?<name>.*?)(['\"])\\s*:\\s*(['\"])(?<value>.*?)(['\"])", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static Regex publicKey=new Regex(Properties.Settings.Default.PublicKey ?? "\"(?<line>.*?)\\\\n\"+", RegexOptions.Compiled);
 
-        private static string basehost = "https://www.daisuki.net";
+        public const string ShowRegexS = "ShowRegex";
+        public const string Show2RegexS = "Show2Regex";
+        public const string ImageServerS = "ImageServer";
+        public const string BgnWrapperS = "BgnWrapper";
+        public const string FlashVarsS = "FlashVars";
+        public const string Flash2VarsS = "Flash2Vars";
+        public const string PublicKeyS = "PublicKey";
+        public const string BaseHostS = "BaseHost";
+
+        public override LibSettings LibSet { get; set; } = new LibSettings
+        {
+            { ShowRegexS,"<div\\sclass=\"latestMovieThumbnail\".*?<img\\sdelay=\"(?<image>.*?)\".*?<p\\sclass=\"episodeNumber\">(?<episode>.*?)</p>.*?<a\\shref=\"(?<url>.*?)\""},
+            { Show2RegexS,"<div\\sclass=\"thumbnail\">.*?<img delay=\"(?<image>.*?)\".*?<a\\shref=\"(?<url>.*?)\">(?<episode>.*?)</a>" },
+            { ImageServerS,"http://img.daisuki.net/"},
+            { BgnWrapperS, "<script.*?src=\"(?<wrapper>.*?bgnwrapper\\.js.*?)\""},
+            { FlashVarsS,"flashvars.*?=*.?{(?<vars>.*?)}" },
+            { Flash2VarsS,"(['\"])(?<name>.*?)(['\"])\\s*:\\s*(['\"])(?<value>.*?)(['\"])"},
+            { PublicKeyS,"\"(?<line>.*?)\\\\n\"+" },
+            { BaseHostS,"https://www.daisuki.net" }
+        };
+        private static Regex showregex;
+        private static Regex show2regex;
+        private static Regex bgnWrapper;
+        private static Regex flashVars;
+        private static Regex flash2Vars;
+        private static Regex publicKey;
+
+        public DaiSuki()
+        {
+            LoadSettings("daisuki_settings.json");
+            showregex = new Regex(LibSet[ShowRegexS], RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            show2regex = new Regex(LibSet[Show2RegexS], RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            bgnWrapper = new Regex(LibSet[BgnWrapperS], RegexOptions.Compiled);
+            flashVars = new Regex(LibSet[FlashVarsS], RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            flash2Vars = new Regex(LibSet[Flash2VarsS], RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            publicKey = new Regex(LibSet[PublicKeyS], RegexOptions.Compiled);
+
+        }
+
+
+
 
         public DownloadPluginInfo Information()
         {
@@ -103,7 +135,7 @@ namespace DaiSukiPlugin
                 form.Add("data[Customer][password]", authenticationmetadata.GetStringFromMetadata(DownloadPluginInfo.Password));
                 form.Add("data[Customer][keep_auth]", "1");
 
-                WebStream ws = await WebStream.Post("https://www.daisuki.net/api2/siteLogin", form, null, UserAgent, null, null, SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
+                WebStream ws = await WebStream.Post("https://www.daisuki.net/api2/siteLogin", form, null, LibSet[UserAgentS], null, null, SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
                 if (ws != null && ws.StatusCode == HttpStatusCode.OK)
                 {
 
@@ -156,7 +188,7 @@ namespace DaiSukiPlugin
                     return new Shows { ErrorMessage = "Invalid Session", Status = ResponseStatus.InvalidArgument };
                 Shows ret = new Shows();
                 ret.Items = new List<Show>();
-                WebStream ws = await WebStream.Get("http://www.daisuki.net/fastAPI/anime/search/?", null, UserAgent, null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
+                WebStream ws = await WebStream.Get("http://www.daisuki.net/fastAPI/anime/search/?", null, LibSet[UserAgentS], null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
                 if (ws != null && ws.StatusCode == HttpStatusCode.OK)
                 {
                     if (!VerifyLogin(ws.Cookies))
@@ -260,7 +292,7 @@ namespace DaiSukiPlugin
                 Episodes ret = new Episodes();
                 ret.Items = new List<Episode>();
 
-                WebStream ws = await WebStream.Get(show.PluginMetadata["Url"], null, UserAgent, null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
+                WebStream ws = await WebStream.Get(show.PluginMetadata["Url"], null, LibSet[UserAgentS], null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
                 if (ws != null && ws.StatusCode == HttpStatusCode.OK)
                 {
                     if (!VerifyLogin(ws.Cookies))
@@ -272,7 +304,7 @@ namespace DaiSukiPlugin
                         rd.Dispose();
                         ret.Status = ResponseStatus.Ok;
                         ret.Items = new List<Episode>();
-                        ret.ImageUri = new Uri(imageServer + "/img/series/" + show.Id + "/340_506.jpg");
+                        ret.ImageUri = new Uri(LibSet[ImageServerS] + "/img/series/" + show.Id + "/340_506.jpg");
                         Match sm = showregex.Match(dta);
                         if (sm.Success)
                         {
@@ -327,7 +359,7 @@ namespace DaiSukiPlugin
                 progress.Report(dp);
                 List<string> todeleteFiles = new List<string>();
 
-                WebStream ws = await WebStream.Get(episode.PluginMetadata["Url"], null, UserAgent, null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
+                WebStream ws = await WebStream.Get(episode.PluginMetadata["Url"], null, LibSet[UserAgentS], null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
                 if (ws != null && ws.StatusCode == HttpStatusCode.OK)
                 {
                     if (!VerifyLogin(ws.Cookies))
@@ -369,7 +401,7 @@ namespace DaiSukiPlugin
                             return ret;
                         }
                         token.ThrowIfCancellationRequested();
-                        ws = await WebStream.Get(basehost+bgn.Groups["wrapper"].Value, null, UserAgent, null, s.cookies.ToCookieCollection(), SocketTimeout, true,null, _info.ProxyFromGlobalRequirements(_global));
+                        ws = await WebStream.Get(LibSet[BaseHostS]+bgn.Groups["wrapper"].Value, null, LibSet[UserAgentS], null, s.cookies.ToCookieCollection(), SocketTimeout, true,null, _info.ProxyFromGlobalRequirements(_global));
                         if (ws == null || ws.StatusCode != HttpStatusCode.OK)
                         {
                             ret.ErrorMessage = "Unable to find Daisuki public key";
@@ -396,7 +428,7 @@ namespace DaiSukiPlugin
                         dp.Percent = 2;
                         progress.Report(dp);
 
-                        ws = await WebStream.Get(basehost + vars["country"]+"?cashPath="+ (long)((DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds), null, UserAgent, null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
+                        ws = await WebStream.Get(LibSet[BaseHostS] + vars["country"]+"?cashPath="+ (long)((DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds), null, LibSet[UserAgentS], null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
                         Country c;
                         if (ws == null || ws.StatusCode != HttpStatusCode.OK)
                         {
@@ -455,7 +487,7 @@ namespace DaiSukiPlugin
                         form.Add("d", Convert.ToBase64String(enc));
                         form.Add("a", Convert.ToBase64String(key));
                         token.ThrowIfCancellationRequested();
-                        ws = await WebStream.Post(basehost+vars["init"], form, null, UserAgent, null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
+                        ws = await WebStream.Post(LibSet[BaseHostS]+vars["init"], form, null, LibSet[UserAgentS], null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
                         if (ws == null || ws.StatusCode != HttpStatusCode.OK)
                         {
                             ret.ErrorMessage = "Unable to retrieve metadata";
@@ -505,7 +537,7 @@ namespace DaiSukiPlugin
                             dp.Languages.Add("Hardcoded");
                         else
                         {
-                            ws = await WebStream.Get(ldta.caption_url + "?cashPath=" + (long)((DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds), null, UserAgent, headers, null, SocketTimeout, true, "http://img.daisuki.net/common2/pages/anime/swf/bngn_player_001.swf", _info.ProxyFromGlobalRequirements(_global));
+                            ws = await WebStream.Get(ldta.caption_url + "?cashPath=" + (long)((DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds), null, LibSet[UserAgentS], headers, null, SocketTimeout, true, "http://img.daisuki.net/common2/pages/anime/swf/bngn_player_001.swf", _info.ProxyFromGlobalRequirements(_global));
                             if (ws == null || ws.StatusCode != HttpStatusCode.OK)
                             {
                                 ret.ErrorMessage = "Unable to retrieve subtitles";
@@ -521,7 +553,7 @@ namespace DaiSukiPlugin
                         dp.Status = "Downloading video";
                         progress.Report(dp);
                         token.ThrowIfCancellationRequested();
-                        ws = await WebStream.Get(playurl, null, UserAgent, headers, null, SocketTimeout, true, "http://img.daisuki.net/common2/pages/anime/swf/bngn_player_001.swf", _info.ProxyFromGlobalRequirements(_global));
+                        ws = await WebStream.Get(playurl, null, LibSet[UserAgentS], headers, null, SocketTimeout, true, "http://img.daisuki.net/common2/pages/anime/swf/bngn_player_001.swf", _info.ProxyFromGlobalRequirements(_global));
                         int idx = playurl.LastIndexOf(".smil/", StringComparison.InvariantCulture);
                         string baseurl = string.Empty;
                         if (idx > 0)
@@ -566,7 +598,7 @@ namespace DaiSukiPlugin
                         token.ThrowIfCancellationRequested();
                         progress.Report(dp);
                         string intermediatefile = dp.FullPath+ ".tm1";                        
-                        FragmentProcessor frag =new FragmentProcessor(ws.Cookies,headers, UserAgent, SocketTimeout, "http://img.daisuki.net/common2/pages/anime/swf/bngn_player_001.swf",null,3,5,intermediatefile);
+                        FragmentProcessor frag =new FragmentProcessor(ws.Cookies,headers, LibSet[UserAgentS], SocketTimeout, "http://img.daisuki.net/common2/pages/anime/swf/bngn_player_001.swf",null,3,5,intermediatefile);
                         double dbl = 91;
                         IProgress<double> d = new Progress<double>((val) =>
                         {

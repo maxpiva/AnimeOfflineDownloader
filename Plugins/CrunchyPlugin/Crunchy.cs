@@ -22,19 +22,59 @@ namespace CrunchyPlugin
 {
     public class Crunchy : BaseDownloadPlugin, IDownloadPlugin
     {
-        CrunchyPluginInfo _info=new CrunchyPluginInfo();
-        private Dictionary<string,object> _global = null;
 
-        private static string showurl = Properties.Settings.Default.ShowUrl ?? "http://www.crunchyroll.com/en/videos/{0}/alpha?group=all";
-        private static string updateurl =Properties.Settings.Default.UpdateUrl ?? "http://www.crunchyroll.com/videos/{0}/updated/ajax_page?pg={1}";
-        private static Regex showregex = new Regex(Properties.Settings.Default.ShowRegex ?? "<li\\sid.*?group_id=\"(?<id>.*?)\".*?<a.*?title=\"(?<title>.*?)\".*?href=\"(?<url>.*?)\".*?</a>.*?</li>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static Regex show2regex = new Regex(Properties.Settings.Default.Show2Regex ?? "\\#media_group_(?<id>.*?)\".*?\"description\":\"(?<desc>.*?)\"", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static Regex epsregex = new Regex(Properties.Settings.Default.EpsRegex ?? "<li\\sid=\"showview_videos_media_(?<id>.*?)\".*?<a.*?href=\"(?<url>.*?)\".*?<img.*?(src|data-thumbnailUrl)=\"(?<image>.*?)\".*?class=\"series-title\\sblock\\sellipsis\"\\sdir=\"auto\">(?<episode>.*?)</span>.*?class=\"short-desc\"\\sdir=\"auto\">(?<title>.*?)</p>.*?<script>.*?\"description\":(?<description>.*?),\"offsetLeft\":", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static Regex updregex = new Regex(Properties.Settings.Default.UpdRegex ?? "<li\\sid=\"media_group.*?group_id=\"(?<show>.*?)\".*?href=\"(?<url>.*?)\".*?<img.*?src=\"(?<image>.*?)\".*?<span.*?>(?<title>.*?)</span>.*?<span.*?>(?<ep>.*?)</span>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static Regex seasonregex = new Regex(Properties.Settings.Default.SeasonRegex ?? "class=\"season-dropdown.*?title=\"(?<season>(.*?))\".*?</ul>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static Regex epsshowimage = new Regex(Properties.Settings.Default.EpsShowImageRegex ?? "<div\\sid=\"sidebar\".*?<img\\sitemprop=\"image\".*?src=\"(?<image>.*?)\".*?/>", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static string RTMPDump = Properties.Settings.Default.RTMPDumpArgs ?? "-r \"{0}\" -a \"{1}\" -y \"{2}\" -o \"{3}\"";
-        private static string RTMPDumpEXE = Properties.Settings.Default.RTMPDumpEXE ?? "rtmpdump.exe";
+
+
+        public const string ShowUrlS = "ShowUrl";
+        public const string UpdateUrlS = "UpdateUrl";
+        public const string ShowRegexS = "ShowRegex";
+        public const string Show2RegexS = "Show2Regex";
+        public const string EpsRegexS = "EpsRegex";
+        public const string UpdRegexS = "UpdRegex";
+        public const string SeasonRegexS = "SeasonRegex";
+        public const string EpsShowImageRegexS = "EpsShowImage";
+        public const string RTMPDumpArgsS = "RTMPDumpArgs";
+        public const string RTMPDumpEXES = "RTMPDumpEXE";
+        public const string DubbedAnimeS = "DubbedAnime";
+
+
+
+        public override LibSettings LibSet { get; set;} = new LibSettings
+        {
+            { ShowUrlS,"http://www.crunchyroll.com/en/videos/{0}/alpha?group=all"},
+            { UpdateUrlS,"http://www.crunchyroll.com/videos/{0}/updated/ajax_page?pg={1}" },
+            { ShowRegexS,"<li\\sid.*?group_id=\"(?<id>.*?)\".*?<a.*?title=\"(?<title>.*?)\".*?href=\"(?<url>.*?)\".*?</a>.*?</li>"},
+            { Show2RegexS, "\\#media_group_(?<id>.*?)\".*?\"description\":\"(?<desc>.*?)\""},
+            { EpsRegexS,"<li\\sid=\"showview_videos_media_(?<id>.*?)\".*?<a.*?href=\"(?<url>.*?)\".*?<img.*?(src|data-thumbnailUrl)=\"(?<image>.*?)\".*?class=\"series-title\\sblock\\sellipsis\"\\sdir=\"auto\">(?<episode>.*?)</span>.*?class=\"short-desc\"\\sdir=\"auto\">(?<title>.*?)</p>.*?<script>.*?\"description\":(?<description>.*?),\"offsetLeft\":" },
+            { UpdRegexS,"<li\\sid=\"media_group.*?group_id=\"(?<show>.*?)\".*?href=\"(?<url>.*?)\".*?<img.*?src=\"(?<image>.*?)\".*?<span.*?>(?<title>.*?)</span>.*?<span.*?>(?<ep>.*?)</span>"},
+            { SeasonRegexS,"class=\"season-dropdown.*?title=\"(?<season>(.*?))\".*?</ul>" },
+            { EpsShowImageRegexS,"<div\\sid=\"sidebar\".*?<img\\sitemprop=\"image\".*?src=\"(?<image>.*?)\".*?/>"},
+            { RTMPDumpArgsS,"-r \"{0}\" -a \"{1}\" -y \"{2}\" -o \"{3}\"" },
+            { RTMPDumpEXES, "rtmpdump.exe"},
+            { DubbedAnimeS," dubbed| dub|anisava|colormail|digimon frontier|digimon tamers|digimon adventure|future card buddyfight|holy knight|karasuma kyoko no jikenbo|lady death movie|mizu no kotoba|rwby|sherlock hound|the mythical detective loki|valerian and laureline|zatch bell|crunchyroll collection|crunchycast|crunchyroll x tokyo" }
+        };
+
+        private static Regex showregex;
+        private static Regex show2regex;
+        private static Regex epsregex;
+        private static Regex updregex;
+        private static Regex seasonregex;
+        private static Regex epsshowimage;
+
+        public Crunchy()
+        {
+            LoadSettings("crunchy_settings.json");
+            showregex = new Regex(LibSet[ShowRegexS], RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            show2regex = new Regex(LibSet[Show2RegexS], RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            epsregex = new Regex(LibSet[EpsRegexS], RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            updregex = new Regex(LibSet[UpdRegexS], RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            seasonregex = new Regex(LibSet[SeasonRegexS], RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+            epsshowimage = new Regex(LibSet[EpsShowImageRegexS], RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        }
+
+        CrunchyPluginInfo _info = new CrunchyPluginInfo();
+        private Dictionary<string, object> _global = null;
+
 
         #region Implementation
 
@@ -102,7 +142,7 @@ namespace CrunchyPlugin
                 form.Add("name", authenticationmetadata.GetStringFromMetadata(DownloadPluginInfo.Username));
                 form.Add("password", authenticationmetadata.GetStringFromMetadata(DownloadPluginInfo.Password));
                 string postdata = form.PostFromDictionary();
-                WebStream ws = await WebStream.Post("https://www.crunchyroll.com/?a=formhandler",form,null,UserAgent,null,null,SocketTimeout,false,null, _info.ProxyFromGlobalRequirements(_global));
+                WebStream ws = await WebStream.Post("https://www.crunchyroll.com/?a=formhandler",form,null,LibSet[UserAgentS],null,null,SocketTimeout,false,null, _info.ProxyFromGlobalRequirements(_global));
                 if (ws != null && ws.StatusCode == HttpStatusCode.Found)
                 {
                     ws.Cookies = await SetLocale(LocaleFromString(authenticationmetadata.GetStringFromMetadata(CrunchyPluginInfo.Language)), ws.Cookies);
@@ -168,8 +208,8 @@ namespace CrunchyPlugin
                     return new Shows { ErrorMessage = "Invalid Session", Status = ResponseStatus.InvalidArgument };
                 Shows ret = new Shows();
                 ret.Items = new List<Show>();
-                string url = string.Format(showurl, ShowFromType(type));
-                WebStream ws = await WebStream.Get(url,null,UserAgent,null,s.cookies.ToCookieCollection(),SocketTimeout,true,null,_info.ProxyFromGlobalRequirements(_global));
+                string url = string.Format(LibSet[ShowUrlS], ShowFromType(type));
+                WebStream ws = await WebStream.Get(url,null,LibSet[UserAgentS],null,s.cookies.ToCookieCollection(),SocketTimeout,true,null,_info.ProxyFromGlobalRequirements(_global));
                 if (ws != null && ws.StatusCode == HttpStatusCode.OK)
                 {
                     if (!VerifyLogin(ws.Cookies))
@@ -233,7 +273,7 @@ namespace CrunchyPlugin
                     return new Episodes { ErrorMessage = "Invalid Show", Status = ResponseStatus.InvalidArgument };
                 Episodes ret = new Episodes();
                 ret.Items = new List<Episode>();
-                WebStream ws = await WebStream.Get(show.PluginMetadata["Url"], null, UserAgent, null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
+                WebStream ws = await WebStream.Get(show.PluginMetadata["Url"], null, LibSet[UserAgentS], null, s.cookies.ToCookieCollection(), SocketTimeout, true, null, _info.ProxyFromGlobalRequirements(_global));
                 if (ws != null && ws.StatusCode == HttpStatusCode.OK)
                 {
                     if (!VerifyLogin(ws.Cookies))
@@ -294,9 +334,7 @@ namespace CrunchyPlugin
         {
             try
             {
-                string deflangcode = "jpn";
-                string deflang = "日本語";
-
+                KeyValuePair<string, string> defl = AudioLanguageFromEpisode(episode);
                 CrunchySession sess = session as CrunchySession;
 
                 if (sess == null)
@@ -339,7 +377,7 @@ namespace CrunchyPlugin
                 dp.FullPath = Path.Combine(downloadpath, dp.FileName);
                 string intermediatefile = Path.Combine(downloadpath, dp.FileName + ".tm1");
                 KeyValuePair<string, string> hh = ParseHost(c.Stream_info.Host);
-                string args = string.Format(RTMPDump, hh.Key, hh.Value, c.Stream_info.File, intermediatefile);
+                string args = string.Format(LibSet[RTMPDumpArgsS], hh.Key, hh.Value, c.Stream_info.File, intermediatefile);
                 List<string> todeleteFiles = new List<string>();
                 todeleteFiles.Add(intermediatefile);
                 dp.Percent = 3;
@@ -354,7 +392,7 @@ namespace CrunchyPlugin
                     dp.Percent = (val * dbl / 100) + 3;
                     progress.Report(dp);
                 };
-                await rtmp.Start(RTMPDumpEXE, args, token);
+                await rtmp.Start(LibSet[RTMPDumpEXES], args, token);
                 if (final < 100)
                     return new Response { ErrorMessage = "Error downloading video", Status = ResponseStatus.TransferError };
                 List<CrunchySubtitleInfo> sis = subTasks.Select(a => a.Result).ToList();
@@ -370,7 +408,7 @@ namespace CrunchyPlugin
                     maps += GetFFMPEGSubtitleArguments(pp + 1, pp, k.Language, k.Title);
                     pp++;
                 }
-                dp.Size = await ReMux(intermediatefile, inputs, maps, formats, deflangcode, deflang, 96, 4, dp, progress, token);
+                dp.Size = await ReMux(intermediatefile, inputs, maps, formats, defl.Key, defl.Value, 96, 4, dp, progress, token);
                 dp.Percent = 100;
                 dp.Status = "Finished";
                 progress.Report(dp);
@@ -494,8 +532,8 @@ namespace CrunchyPlugin
             bool end = false;
             do
             {
-                string url = string.Format(updateurl, ShowFromType(t), startpage);
-                WebStream ws = await WebStream.Get(url, null,UserAgent, null, s.cookies.ToCookieCollection(),SocketTimeout,true,null,_info.ProxyFromGlobalRequirements(_global));
+                string url = string.Format(LibSet[UpdateUrlS], ShowFromType(t), startpage);
+                WebStream ws = await WebStream.Get(url, null,LibSet[UserAgentS], null, s.cookies.ToCookieCollection(),SocketTimeout,true,null,_info.ProxyFromGlobalRequirements(_global));
                 if (ws != null && ws.StatusCode == HttpStatusCode.OK)
                 {
                     if (!VerifyLogin(ws.Cookies))
@@ -563,7 +601,7 @@ namespace CrunchyPlugin
 
             try
             {
-                WebStream ws = await WebStream.Get(placeholder.PluginMetadata["Url"], null, UserAgent, null, s.cookies.ToCookieCollection(), SocketTimeout,true,null,_info.ProxyFromGlobalRequirements(_global));
+                WebStream ws = await WebStream.Get(placeholder.PluginMetadata["Url"], null, LibSet[UserAgentS], null, s.cookies.ToCookieCollection(), SocketTimeout,true,null,_info.ProxyFromGlobalRequirements(_global));
                 if (ws != null && ws.StatusCode == HttpStatusCode.OK)
                 {
                     if (!VerifyLogin(ws.Cookies))
@@ -766,7 +804,7 @@ namespace CrunchyPlugin
             form.Add("auto_play", "1");
             form.Add("show_pop_out_controls", "1");
             form.Add("current_page", "http://www.crunchyroll.com/");
-            WebStream ws = await WebStream.Post("http://www.crunchyroll.com/xml/",form,null,UserAgent, null, token.cookies.ToCookieCollection(), SocketTimeout,true,"http://www.crunchyroll.com/swf/StandardVideoPlayer.swf", _info.ProxyFromGlobalRequirements(_global));
+            WebStream ws = await WebStream.Post("http://www.crunchyroll.com/xml/",form,null,LibSet[UserAgentS], null, token.cookies.ToCookieCollection(), SocketTimeout,true,"http://www.crunchyroll.com/swf/StandardVideoPlayer.swf", _info.ProxyFromGlobalRequirements(_global));
             string dta = null;
             if (ws!=null && ws.StatusCode == HttpStatusCode.OK)
             {
@@ -790,7 +828,7 @@ namespace CrunchyPlugin
             Dictionary<string, string> form = new Dictionary<string, string>();
             form.Add("req", "RpcApiSubtitle_GetXml");
             form.Add("subtitle_script_id", subid.ToString());
-            WebStream ws = await WebStream.Post("http://www.crunchyroll.com/xml/", form, null, UserAgent, null, token.cookies.ToCookieCollection(), SocketTimeout,true,"http://www.crunchyroll.com/swf/StandardVideoPlayer.swf", _info.ProxyFromGlobalRequirements(_global));
+            WebStream ws = await WebStream.Post("http://www.crunchyroll.com/xml/", form, null, LibSet[UserAgentS], null, token.cookies.ToCookieCollection(), SocketTimeout,true,"http://www.crunchyroll.com/swf/StandardVideoPlayer.swf", _info.ProxyFromGlobalRequirements(_global));
             string dta = null;
             if (ws.StatusCode == HttpStatusCode.OK)
             {
@@ -812,7 +850,7 @@ namespace CrunchyPlugin
             form.Add("req", "RpcApiTranslation_SetLang");
             form.Add("locale", "enUS");
 
-            WebStream ws = await WebStream.Post("http://www.crunchyroll.com/ajax/", form, null, UserAgent, null, cookies, SocketTimeout, false, null, _info.ProxyFromGlobalRequirements(_global));
+            WebStream ws = await WebStream.Post("http://www.crunchyroll.com/ajax/", form, null, LibSet[UserAgentS], null, cookies, SocketTimeout, false, null, _info.ProxyFromGlobalRequirements(_global));
             if (ws != null && ws.StatusCode == HttpStatusCode.OK)
                 return ws.Cookies;
             return new CookieCollection();
@@ -827,6 +865,23 @@ namespace CrunchyPlugin
                 tp = "pop";
             return tp;
         }
+
+        private KeyValuePair<string, string> AudioLanguageFromEpisode(Episode ep)
+        {
+            string s1 = ep.ShowName.Replace("(", string.Empty).Replace(")", string.Empty).Trim().ToLower(CultureInfo.InvariantCulture);
+            string s2 = string.IsNullOrEmpty(ep.SeasonAlpha) ? string.Empty : ep.SeasonAlpha.Replace("(", string.Empty).Replace(")", string.Empty).Trim().ToLower(CultureInfo.InvariantCulture);
+            string s3 = string.IsNullOrEmpty(ep.Name) ? string.Empty : ep.Name.Replace("(", string.Empty).Replace(")", string.Empty).Trim().ToLower(CultureInfo.InvariantCulture);
+            foreach (string s in LibSet[DubbedAnimeS].Split('|'))
+            {
+                if (s1.Contains(s) || s2.Contains(s) || s3.Contains(s))
+                {
+                    return new KeyValuePair<string, string>("eng","English");
+                }
+            }
+            return new KeyValuePair<string, string>("jpn", "日本語");
+
+        }
+
         private void AddEpisodes(Episodes ret, Show show, string data, string seasoname, int seasonnum, bool firstone = false)
         {
             MatchCollection col = epsregex.Matches(data);

@@ -94,6 +94,7 @@ namespace ADBaseLibrary
                 if (dinfo != null && (dinfo.Status == DownloadStatus.Downloading))
                     dinfo.Cancel();
             }
+            _downloads.Remove(dinfo);
             Save();
         }
 

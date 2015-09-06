@@ -126,17 +126,21 @@ namespace AnimeDownloader
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            List<DownloadItem> downs = objDownloads.Objects.Cast<DownloadItem>().ToList();
-            if (downs.Any(a => a.Status == DownloadStatus.Downloading))
+            if (objDownloads.Objects != null)
             {
-                DialogResult r=MessageBox.Show("Are you sure you want to quit, there is some downloads left?", "Quit?",
-                    MessageBoxButtons.YesNo);
-                if (r == DialogResult.No)
+                List<DownloadItem> downs = objDownloads.Objects.Cast<DownloadItem>().ToList();
+                if (downs.Any(a => a.Status == DownloadStatus.Downloading))
                 {
-                    e.Cancel = true;
-                    return;
+                    DialogResult r = MessageBox.Show("Are you sure you want to quit, there is some downloads left?",
+                        "Quit?",
+                        MessageBoxButtons.YesNo);
+                    if (r == DialogResult.No)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                    butRemoveAll_Click(null, null);
                 }
-                butRemoveAll_Click(null, null);
             }
             DownloadPluginHandler.Instance.Exit();
             e.Cancel = false;
