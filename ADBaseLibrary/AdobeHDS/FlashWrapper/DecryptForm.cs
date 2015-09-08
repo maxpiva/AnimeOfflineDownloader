@@ -60,10 +60,10 @@ namespace ADBaseLibrary.AdobeHDS.FlashWrapper
             string swf = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "loader.swf");
             if (File.Exists(swf))
                 form.axShock.LoadMovie(0, swf);
-            form.axShock.Stop();
-            form.axShock.Dispose();
             thscheduler= TaskScheduler.FromCurrentSynchronizationContext();
             Application.Run();
+            form.axShock.Stop();
+            form.axShock.Dispose();
         }
         public DecryptForm()
         {

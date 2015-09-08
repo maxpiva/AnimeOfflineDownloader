@@ -598,7 +598,7 @@ namespace DaiSukiPlugin
                         token.ThrowIfCancellationRequested();
                         progress.Report(dp);
                         string intermediatefile = dp.FullPath+ ".tm1";                        
-                        FragmentProcessor frag =new FragmentProcessor(ws.Cookies,headers, LibSet[UserAgentS], SocketTimeout, "http://img.daisuki.net/common2/pages/anime/swf/bngn_player_001.swf",null,3,5,intermediatefile);
+                        FragmentProcessor frag =new FragmentProcessor(ws.Cookies,headers, LibSet[UserAgentS], SocketTimeout, "http://img.daisuki.net/common2/pages/anime/swf/bngn_player_001.swf", _info.ProxyFromGlobalRequirements(_global), 3,5,intermediatefile);
                         double dbl = 91;
                         IProgress<double> d = new Progress<double>((val) =>
                         {
