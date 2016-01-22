@@ -41,9 +41,9 @@ namespace CrunchyPlugin
 
         public override LibSettings LibSet { get; set;} = new LibSettings
         {
-            { ShowUrlS,"http://www.crunchyroll.com/en/videos/{0}/alpha?group=all"},
+            { ShowUrlS,"http://www.crunchyroll.com/videos/{0}/alpha?group=all"},
             { UpdateUrlS,"http://www.crunchyroll.com/videos/{0}/updated/ajax_page?pg={1}" },
-            { ShowRegexS,"<li\\sid.*?group_id=\"(?<id>.*?)\".*?<a.*?title=\"(?<title>.*?)\".*?href=\"(?<url>.*?)\".*?</a>.*?</li>"},
+            { ShowRegexS,"media_group.*?group_id=\"(?<id>.*?)\".*?<a.*?title=\"(?<title>.*?)\".*?href=\"(?<url>.*?)\""},
             { Show2RegexS, "\\#media_group_(?<id>.*?)\".*?\"description\":\"(?<desc>.*?)\""},
             { EpsRegexS,"<li\\sid=\"showview_videos_media_(?<id>.*?)\".*?<a.*?href=\"(?<url>.*?)\".*?<img.*?(src|data-thumbnailUrl)=\"(?<image>.*?)\".*?class=\"series-title\\sblock\\sellipsis\"\\sdir=\"auto\">(?<episode>.*?)</span>.*?class=\"short-desc\"\\sdir=\"auto\">(?<title>.*?)</p>.*?<script>.*?\"description\":(?<description>.*?),\"offsetLeft\":" },
             { UpdRegexS,"<li\\sid=\"media_group.*?group_id=\"(?<show>.*?)\".*?href=\"(?<url>.*?)\".*?<img.*?src=\"(?<image>.*?)\".*?<span.*?>(?<title>.*?)</span>.*?<span.*?>(?<ep>.*?)</span>"},
@@ -226,12 +226,17 @@ namespace CrunchyPlugin
                             if (m.Success)
                             {
                                 Show cs = new Show();
+
                                 cs.Id = int.Parse(m.Groups["id"].Value).ToString();
-                                cs.Name = m.Groups["title"].Value;
-                                cs.Type = type;
-                                cs.PluginName = CrunchyPluginInfo.PluginName;
-                                cs.PluginMetadata.Add("Url",new Uri("http://www.crunchyroll.com" + m.Groups["url"].Value).ToString());
-                                ls.Add(cs.Id, cs);
+                                if (!ls.ContainsKey(cs.Id))
+                                {
+                                    cs.Name = m.Groups["title"].Value;
+                                    cs.Type = type;
+                                    cs.PluginName = CrunchyPluginInfo.PluginName;
+                                    cs.PluginMetadata.Add("Url",
+                                        new Uri("http://www.crunchyroll.com" + m.Groups["url"].Value).ToString());
+                                    ls.Add(cs.Id, cs);
+                                }
                             }
                         }
                         col = show2regex.Matches(dta);

@@ -30,7 +30,7 @@ namespace ADBaseLibrary
         public void LoadSettings(string settings)
         {
             baseSettings.ToList().ForEach(a=>LibSet.Add(a.Key,a.Value));
-            LibSet.Load(settings);
+            //LibSet.Load(settings);
             SocketTimeout = 50000;
             int.TryParse(LibSet[SocketTimeoutS], out SocketTimeout);
 

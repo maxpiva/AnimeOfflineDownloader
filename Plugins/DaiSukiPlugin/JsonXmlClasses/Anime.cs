@@ -11,8 +11,15 @@ namespace DaiSukiPlugin.JsonXmlClasses
         public string AdId { get; set; }
         [JsonProperty("title")]
         public string Title { get; set; }
-        [JsonProperty("release_open")]
-        public string ReleaseOpen { get; set; }
+
+
+        [JsonProperty("imageURL_l")]
+        public string LargeImage { get; set; }
+
+        [JsonProperty("imageURL_s")]
+        public string SmallImage { get; set; }
+
+
         [JsonProperty("synopsis")]
         public string Synopsis { get; set; }
     }

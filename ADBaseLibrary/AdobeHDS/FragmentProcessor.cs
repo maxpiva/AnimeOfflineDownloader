@@ -152,18 +152,27 @@ namespace ADBaseLibrary.AdobeHDS
         }
         public async Task DoNextFragment()
         {
-            KeyValuePair<int, int>? v = bootstrap.GetNextRead();
-            if (v == null)
-                return;
-            string url = string.Format(FormatFrag, baseurl, media.Url, v.Value.Key, v.Value.Value+1, keydata, manifest.Pv20.Substring(1));
-            WebStream ws = await GetStream(url);
-            if (ws == null || ws.StatusCode != HttpStatusCode.OK)
+            try
+
             {
+                KeyValuePair<int, int>? v = bootstrap.GetNextRead();
+                if (v == null)
+                    return;
+                string url = string.Format(FormatFrag, baseurl, media.Url, v.Value.Key, v.Value.Value + 1, keydata, manifest.Pv20.Substring(1));
+                WebStream ws = await GetStream(url);
+                if (ws == null || ws.StatusCode != HttpStatusCode.OK)
+                {
+                    ws?.Dispose();
+                    throw new IOException("Error " + ws.StatusCode + " trying to download fragment");
+                }
+                await ProcessFragment(ws, v.Value.Value);
                 ws?.Dispose();
-                throw new IOException("Error " + ws.StatusCode + " trying to download fragment");
             }
-            await ProcessFragment(ws, v.Value.Value);
-            ws?.Dispose();
+            catch (Exception e)
+            {
+                int a = 1;
+            }
+
         }
 
 
